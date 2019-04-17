@@ -13,8 +13,12 @@ public class TexasMule {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String ingredient1 = "Horse";
-		String ingredient2 = "Donkey";
+		String ingredient1 = null;
+		String ingredient2 = null;
+		if (ingredient1 == null || ingredient2 == null) {
+			ingredient1 = System.getProperty("ing1");
+			ingredient2 = System.getProperty("ing2");
+		}
 		
 		TexasMule firstDrink = new TexasMule();
 		String finishedFirstDrink = firstDrink.add(ingredient1, ingredient2);
