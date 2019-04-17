@@ -71,3 +71,142 @@ Package project into a jar file in target
 
 Remove target folder and compiled build
 >mvn clean
+
+## Object-Oriented Programming
+Although Java accommodates several paradigms, OOP is the foundation for most applications. In OOP, a program is organized into objects encapsulating related fields (representing its *state*) and methods (usually to control that state or perform related functions). When defining objects, Java reserves the keyword *class* (not to be confused with the *.class* file extension) which serves as their blueprint. An object in Java represents an instance in memory of a class, and also every class implicitly inherits from the *Object* superclass which provides useful convenience methods such as *equals()* and *toString()*. Java popularized several 'Pillars' of OOP design theory. While the numbers vary between OOP languages, Java focuses on four:
+
+    - *Abstraction* - By simplifying objects to a set of useful features, we hide irrelevant details, reduce complexity, and increase efficiency. Abstraction is important at all levels of software and computer engineering, but essential to designing useful objects. Complicated real-world objects are reduced to simple representations.
+
+    - *Encapsulation* - Objects should group together related variables and functions and be in complete control over them. So the state of an object should only change, if ever, through the object itself. Also known as data hiding, because the object has sole responsibility for its fields, and no outside object or function should interfere.
+
+    - *Inheritance* - Code reuse is an important principle of programming (DRY - Don't Repeat Yourself), and new classes can reuse code from existing ones. This establishes a superclass-subclass (or parent-child) relationship where the derived classes inherit (and sometimes change) fields and methods from its parent.
+
+    - *Polymorphism* - With inheritance, an object of a derived class can be referenced as instances of its parent class. This provides flexibility when invoking inherited methods with varying implementations in derived classes.
+
+## Variables
+A value is stored and identified in memory by a variable. Variables have a name that makes it possible to access the value, and a type that defines what sort of value it stores.
+```java
+int variableName = 64;
+String txtVar = "Hello World";
+```
+
+## Primitive data types
+Java handles two kinds of datatypes: primitives and references. Primitives are variables that store simple values. There are eight in Java.
+- Integer types: **byte**, **short**, **int**, and **long** (42)  
+- Floating-point types: **float**, and **double** (3.1415)  
+- Logical types: **boolean** (true)  
+- Character type: **char** ('x')
+
+## Reference types
+Reference types store the memory address location of more complex data types in the heap. Reference types include:
+- Classes
+- Interfaces
+- Enums
+- Arrays
+
+## Naming variables
+- Case sensitivity
+- Can only use letters, numbers, and *$* or *_* characters
+- Cannot begin with a number
+- Cannot be a reserved Java keyword
+
+## Scopes of a variable
+A variable's reference will only exist within the context of its declared scope, which is based on the location of its declaration.
+
+- **Static** or class scoped variables are visible to all instances of a related class.
+- **Instance** or object scoped variables are visible to only that object instance.
+- **Local** or method scoped variables are visible only within a method.
+- **Block** or loop scoped variables are visible only within a block statement.
+
+Be aware of *shadowing*: when two variables in different scopes share names.
+
+## Methods
+Methods accept a list of arguments known as *parameters* and return some value. They are used to implement repeatable, consistent actions on variable input, much like math functions.
+```java
+public int myMethod(int a, int b);
+public int myMethod(int a);
+```
+
+## Constructors
+Classes not only define object fields and methods, but how it should be instantiated through special methods called constructors. Constructors must have no return type and share the same name as its class. Java will automatically give you a *noargs* constructor. However, if you define any constructor, you will lose the automatically given constructor.
+
+While a constructor may be *private*, used for singletons, it may not be *final*, *static*, or *abstract*.
+
+## Access modifiers
+- **private** - accessible only within the context of that class
+- **default** - accessible within the context of a package, has no associated keyword so is set when no modifier is used
+- **protected** - accessible to the package, but also to derived child classes outside of the package
+- **public** - accessible anywhere
+
+Classes should only be public or default. There are no cascading access levels, and unspecified fields will be default. Subclasses can only change inherited fields to be less restrictive.
+
+# Arrays
+## Declaration
+Java Arrays are special reference types that store similarly typed data iteratively. A pair of brackets define an array of some data type, and can be written anywhere after the type:
+```java
+// One-Dimensional Arrays
+int[] arrayOne;
+int []arrayTwo;
+int arrayThree[];
+
+// Two-Dimensional Arrays
+int[][] 2DArrayOne;
+int 2DArrayTwo[][];
+int []2DArrayThree[];
+```
+
+## Definition
+While Java does not allow direct memory access to its arrays like other languages, they are still of fixed size once defined by the `new` keyword or by an array literal.
+```java
+// One-Dimensional Arrays
+int[] instancedArray = new int[3];
+int[] literalArray = {1, 2, 3};
+
+// Two-Dimensional Arrays
+int[][] instanced2DArray = new int[3][4];
+int[][] literal2DArray = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
+```
+
+## Iteration
+Java for loops can iterate through arrays like most other languages:
+```java
+// One-Dimensional Arrays
+for (int i = 0; i < arrayOne.length; i++) {
+    System.out.print(arrayOne[i]);
+}
+
+// Two-Dimensional Arrays
+for (int i = 0; i < 2DArrayOne.length; i++) {
+    for (int j  =0; j < 2DArrayOne[i].length; j++) {
+        System.out.print(2DArrayOne[i][j]);
+    }
+}
+
+// Foreach loops
+for (int i : arrayOne) {
+    System.out.print(i);
+}
+```
+
+## Manipulation
+The `java.util.Arrays` class provides various methods for manipulating arrays.
+
+```java
+int[] messyArray = {234, 5346, 3, 64};
+Arrays.sort(messyArray);
+System.out.println(Arrays.toString(messyArray));
+```
+
+## Varargs
+Varargs is a special parameter that can accept multiple arguments of the same type into a dynamically constructed array, and denoted by an ellipsis (...) instead of brackets. A varargs parameter must be the last or only parameter in a method signature. 
+```java
+varArgMethod("m", 1, 2, 5, 35, 346, 345, 4634);
+
+...
+
+public static void varArgDemo(String m, int... intArgs) {
+    for (int i : intArgs) {
+        System.out.print(i);
+    }
+}
+```
