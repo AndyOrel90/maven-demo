@@ -14,17 +14,17 @@ public class PStore {
 
 	public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeySpecException {
 		String password = "password";
-		MessageDigest md = MessageDigest.getInstance("SHA-512");
+//		MessageDigest md = MessageDigest.getInstance("SHA-512");
 		
 		SecureRandom sr = new SecureRandom();
 		byte[] salt = new byte[16];
 		sr.nextBytes(salt);
-		md.update(salt);
+//		md.update(salt);
 		
 		KeySpec ks = new PBEKeySpec(password.toCharArray(), salt, 100000, 128);
 		SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 		
-		//byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
+//		byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
 		byte[] hash = skf.generateSecret(ks).getEncoded();
 		for (byte i : hash) {
 			System.out.print(i);

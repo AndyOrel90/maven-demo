@@ -1,4 +1,4 @@
-package com.revature;
+package com.revature.mule;
 
 public class MoscowMule extends Mule {
 

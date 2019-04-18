@@ -1,4 +1,4 @@
-package com.revature;
+package com.revature.mule;
 
 public abstract class Mule implements Drinkable {
 
