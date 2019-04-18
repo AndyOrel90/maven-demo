@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.revature;
+package com.revature.mule;
 
 /**
  * @author Mehrab
