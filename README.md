@@ -210,3 +210,165 @@ public static void varArgDemo(String m, int... intArgs) {
     }
 }
 ```
+
+# Exception Handling
+When an something wrong occurs during execution, the current stack frame will throw an exception. If the exception is not handled, or thrown up the stack to be handled elsewhere, the program will crash. Good exception handling helps a program continue execution. Common issues which can throw exceptions involve stack or heap memory overflow, an array iterating out of bounds, or an interrupted stream or thread.
+
+## Hierarchy
+Exception and error objects extend Throwable and are either checked or unchecked.
+* Throwable (checked)
+    * Exception (checked)
+        * RuntimeException (unchecked)
+    * Error (unchecked)
+
+Checked exceptions
+Unchecked exceptions / Runtime exceptions
+Errors
+Runtime and unchecked exceptions refer to the same thing. We can often use them interchangeably. 
+
+Checked Exceptions are compile-time issues that must be handled or thrown before the compiler can build, such as `IOException`. Unchecked Exceptions occur at runtime, so the compiler cannot predict them and does not force they be handled. Most unchecked exceptions extend RuntimeException, such as `NullPointerException`. Errors are serious issues and should not be handled, such as `StackOverflowError`.
+
+## Throws
+The `throws` keyword re-throws an exception up the stack to the method that called the throwing method. If the exception is continually thrown and never handled, the compiler will be satisfied in the case of checked exceptions but any issues will still break the program.
+```java
+public void methodThatThrows() throws IOException {
+    // throw (singular) will throw a new exception every time.
+    throw new IOException();
+}
+
+public void methodThatCalls() {
+    methodThatThrows(); // IOException must now be handled here, or methodThatCalls() must use throws as well
+}
+```
+
+## Try-Catch
+The most basic form of exception handling is the try-catch:
+```java
+public void methodThatThrows() throws IOException {
+    try {
+        throw new IOException();
+    } catch (IOException exception) {
+        // Do something with the exception
+        logger.warn("IOException thrown");
+    }
+}
+```
+
+A try block must be followed by at least one catch (or finally) block, but there can be any number of catch blocks for specific (or broad) exceptions. Catch blocks must be ordered from most specific to least specific Exception objects else later catch blocks catching subclasses of exceptions caught in catch blocks above it will become unreachable code.
+
+Multiple exceptions can also be handled in one catch block:
+```java
+public void methodThatThrows() throws IOException {
+    try {
+        throw new IOException();
+    } catch (IOException ex1 | ServletException ex2) {
+        // Do something with the exception
+        logger.warn("IOException thrown");
+    }
+}
+```
+
+## Finally
+Try blocks can be followed by one finally block, and can either replace the mandatory single catch block or follow one or more catch blocks. They are always guaranteed to execute, even if no exceptions are thrown, and are useful for closing resources that may be left open in memory due to an interruption from a thrown exception.
+```java
+public void methodThatThrows() throws IOException {
+    try {
+        throw new IOException();
+    } finally {
+        System.out.println("Will always run");
+    }
+}
+```
+
+## Try-with-resources
+Declaring and defining a resource - any object that implements AutoCloseable - within a pair of parenthesis after the try keyword removes the necessity of a finally block to close that resource.
+```java
+public void methodThatThrows() throws IOException {
+    try (FileReader fr = new FileReader()) {
+        throw new IOException();
+    } catch (IOException exception) {
+        logger.warn("IOException thrown");
+    }
+}
+```
+
+# I/O
+## InputStream/OutputStream -> BufferedReader/BufferedWriter
+The JVM can connect to external datasources such as files or network ports. InputStream/OutputStream and its implementations stream this data as an array of bytes whereas Reader/Writer and its implementations wrap InputStream/OutputStream to stream data as a char array. BufferedReader/BufferedWriter wraps Reader/Writer to stream several characters at a time, minimizing the number of I/O operations needed.
+
+```java
+BufferedReader br = new BufferedReader(
+  new StringReader("Bufferedreader vs Console vs Scanner in Java"));
+BufferedReader br = new BufferedReader(
+  new FileReader("file.txt"));
+BufferedReader br = new BufferedReader(
+  new InputStreamReader(System.in));
+
+BufferedReader fbreader = new BufferedReader(new FileReader("input.txt"));
+BufferedReader isbreader = new BufferedReader(new InputStreamReader(System.in));
+BufferedReader niofbreader = Files.newBufferedReader(Paths.get("input.txt"));
+
+try (BufferedReader reader = new BufferedReader(new FileReader("input.txt"))) {
+	return readAllLines(reader);
+}
+
+public String readAllLines(BufferedReader reader) throws IOException {
+	StringBuilder content = new StringBuilder();
+	String line;
+	while ((line = reader.readLine()) != null) {
+		content.append(line);
+		content.append(System.ineSeparator());
+	}
+	return content.toString();
+}
+```
+
+# Scanner
+BufferedReader provides many convenient methods for parsing data. Scanner can achieve the same, but unlike BufferedReader it is not thread-safe. It can however parse primitive types and Strings with regular expressions. Scanner has a buffer as well but its size is fixed and smaller than BufferedReader by default. BufferedReader requires handling IOException while Scanner does not. Thus, Scanner is best used for parsing input into tokenized Strings.
+
+```java
+Scanner sc = new Scanner(new File("input.txt"));
+Scanner issc = new Scanner(new FileInputStream("input.txt"));
+Scanner csc = new Scanner(System.in);
+Scanner strsc = new Scanner("A B C D");
+```
+
+# Properties
+Load properties as key-value pairs from a file
+//app.properties
+```
+key=value
+```
+
+```java
+Properties props = new Properties();
+props.load(new FileInputStream("app.properties");
+String value = props.getProperty("key", "defaultValue");
+```
+
+# Security
+```java
+SecureRandom random = new SecureRandom();
+byte[] salt = new byte[16];
+random.nextBytes(salt);
+
+// Using SHA
+MessageDigest md = MessageDigest.getInstance("SHA-512");
+md.update(salt);
+byte[] hashedPassword = md.digest(passwordToHash.getBytes(StandardCharsets.UTF_8));
+
+// Using PBKDF2
+KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+byte[] hash = factory.generateSecret(spec).getEncoded();
+```
+
+# Reflection
+Reflection allows one to examine or modify runtime behavior of a program. Java's Reflection API mostly allows introspection of structure, while modifying is only allowed on access modifiers of methods and fields. Many frameworks such as JUnit, Application/Servlet Containers, and Spring use reflection to examine class fields, construct objects, and invoke methods at runtime.
+
+```java
+Class<?> c = Class.forName("classpath.and.classname");
+Object o = c.newInstance();
+Method m = c.getDeclaredMethod("aMethod", new Class<?>[0]);
+m.invoke(o);
+```
