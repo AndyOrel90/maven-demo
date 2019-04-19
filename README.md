@@ -372,3 +372,210 @@ Object o = c.newInstance();
 Method m = c.getDeclaredMethod("aMethod", new Class<?>[0]);
 m.invoke(o);
 ```
+
+# Generics
+When passing objects into methods and data structures, a developer can overload or extend for its specific type or cast the object up and down its inheritance heirarchy. In contrast a generic type improves code reuse and type safety, reducing code by allowing methods and data structures to accept any type without risking dynamic runtime exceptions. Generic type parameters act as placeholders in a method signature while diamond operators specify the type for the compiler to enforce at compile time:
+
+```java
+ArrayList<String> list = new ArrayList<>();
+
+public <T> String genericToString(T a) {   
+    return a.toString();
+}
+
+
+public <T, E> String genericToStrinCat(T a, E b) {   
+    return a.toString() + b.toString();
+}
+```
+
+The type parameters T and E will be replaced by the compiler through type erasure:
+```java
+String s1 = genericToString(1);
+String s2 = genericToString("Hello", 3.5);
+```
+
+# Collections Framework
+Java's collections framework implement common data structures for objects.
+
+- **List** is an ordered collection of elements. A user has the ability to place an element anywhere in the list. The elements are accessable by their index. Unlike **Set**, **List** typically allows for duplicate elements such that element1.equals(element2). In addition to duplicates, **List** allow for multiple null elements to be stored.  
+  
+- **Set** is a collection of non duplicate elements meaning there will never exist a situation where element1.equals(element2). In addition to this, it is implied that there can only exist one null element due to the no duplicates rule.  
+
+- **Queue** is a collection of elements who in essence cannot be iterated, instead the **Queue** follows the **FIFO** (First In First Out) rule. When an element is added to the **Queue** it is placed at the back and when an element is pulled it is pulled from the from the front (index :0).  
+  
+- **Deque** extends **Queue** but augments the ability to insert and remove elements at either end. The name is short for "Double Ended Queue" and is pronounced "Deck".  
+  
+- **Map** is an interface which stores data with a key. A map cannot contain duplicate keys; each key can map to at most one value. **Map** can be visualized like a dictionary where only one word is paired with one definition.  
+
+# Comparable vs Comparator
+Comparable is a functional interface used to define a 'natural ordering' between instances of a class, commonly used by sorted collections such as TreeSet.
+
+Comparator is another functional interface used in a dedicated utility class that can compare two different instances passed to it. It can be passed to a sort method, such as Collections.sort() or Arrays.sort(), or to sorted collections.
+
+For example, to automatically sort a TreeSet of type Person according to age. We can either make the object class comparable or pass the constructor a comparator.
+
+## Comparable
+```java
+class Person implements Comparable<Person>{
+	int age;
+ 
+	Person(int age) {
+		this.age = age;
+	}
+ 
+	@Override
+	public int compareTo(Person o) {
+		return o.age - this.age;
+	}
+}
+ 
+public static void main(String[] args) {
+	TreeSet<Person> persons = new TreeSet<Person>();
+	persons.add(new Person(43));
+	persons.add(new Person(25));
+	persons.add(new Person(111));
+}
+```
+
+## Comparator
+```java
+class Person {
+	int age;
+ 
+	Person(int age) {
+		this.age = age;
+	}
+}
+ 
+class PersonAgeComparator implements Comparator<Person> {
+	@Override
+	public int compare(Person a, Person b) {
+		return a.age - b.age;
+	}
+}
+ 
+public static void main(String[] args) {
+	TreeSet<Person> persons = new TreeSet<Person>(new PersonAgeComparator());
+	persons.add(new Person(43));
+	persons.add(new Person(25));
+	persons.add(new Person(111));
+}
+```
+
+# Threads
+A *thread* is a unit of program execution that runs independently from other threads. Java programs can consist of multiple threads of execution that behave as if they were running on independent CPUs.
+
+- `java.lang.Thread` is the Thread class representing a thread, which you can extend and then override its run() method. Afterwards, you call start().
+- `java.lang.Runnable` is a functional interface (meaning only one method) which you can implement and then override run(). Afterwards, you can pass the object to a Thread instance and run start().
+- The `synchronized` keyword is a modifier that can be used to write blocks of code, methods, or other resources to protect it in a multithreaded environment.
+- `wait()` and `notify()` or `notifyAll()` methods of `java.lang.Object` can be used to suspend or wake up threads.
+
+Besides the main thread, developers can instantiate their own when:
+
+1. A custom class extends the `Thread` class 
+1. A `Thread` is passed an implemented `Runnable` instance
+
+Override the `run()` method in both cases to define the program to be run concurrently in the new thread, then call the Thread instance's `start()` method.
+
+## Extend `Thread`
+```java
+public class CustomThread extends Thread {
+    @Override
+    public void run() {
+        // Do something
+    }
+
+    public static void main(String[] args) {
+        new CustomThread().start();
+    }
+}
+```
+
+## Implement `Runnable`
+```java
+public class CustomRunnable implements Runnable {
+    @Override
+    public void run() {
+        // Do something
+    }
+
+    public static void main(String[] args) {
+        new Thread(new CustomRunnable()).start();
+    }
+}
+```
+
+## Anonymous `Runnable` Class
+```java
+new Thread(new Runnable() {
+        public void run() {
+            // Do something
+        }
+    }).start();
+```
+
+## `Runnable` Lambda
+```java
+new Thread(
+    () -> { /* Do something */ };
+    ).start();
+```
+
+# JDBC API
+Java Database Connectivity (JDBC) is an API for connecting to a RDBMS such as Oracle, PostgreSQL, or MySQL. As a collection of interfaces it requires a driver from the database vendor on the classpath. Once added, a `java.sql.Connection` is used to send SQL queries with `java.sql.Statement`, `java.sql.PreparedStatement`, or `java.sql.CallableStatement` objects, and retrieve result sets in `java.sql.ResultSet` objects.
+
+```java
+// Loading the driver may not be necessary, but it's good to specify
+try {
+    Class.forName("org.postgresql.Driver");
+} catch (java.lang.ClassNotFoundException e) {
+    System.out.println(e.getMessage());
+}
+
+// Pay attention to the url pattern
+String url = "jdbc:postgresql://host:port/database";
+String username = "databaseuser"
+String password = "password"
+
+try (
+    // Be sure to close all connections after use
+    Connection connection = DriverManager.getConnection(url, username, password);
+    Statement statement = connection.createStatement();
+){
+    // executeUpdate() returns the number of rows affected for DML
+    int rowCount = statement.executeUpdate("insert into pizza values (1, 'cheese')");
+
+    // executeQuery() returns a ResultSet object for queries
+    ResultSet pizzas = statement.executeQuery("select * from pizza");
+
+    // Loop through ResultSet for each row returned
+    while(pizzas.next()) {
+        System.out.println(pizzas.getInt("id"));
+        System.out.println(pizzas.getString("flavor"));
+    }
+
+} catch (SQLException ex) {
+    
+} 
+```
+
+## Statement
+A Statement object sends queries and updates, as well as receive errors or ResultSets.
+
+**Statement** is prone to SQL Injection attacks, especially if you use a raw string to write the query.
+
+**PreparedStatement** is a precompiled SQL statement. It is best used for writing several similar queries in a loop, but will also as a side effect protect against SQL Injections
+```java
+PreparedStatement ps = myConnection.prepareStatement("UPDATE ANIMALS SET name=? WHERE id=?");
+ps.setString(1, "Hippo");
+ps.setInt(2, 7);
+ps.executeQuery();
+```
+**CallableStatement** execute stored procedures and can return 1 or many ResultSets.
+```java
+CallableStatement cs = myConnection.prepareCall("{CALL BIRTHDAY_SP(?, ?)}");
+cs.setInt(1, aid);
+cs.setInt(2, yta);
+cs.execute();
+```
